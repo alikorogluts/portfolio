@@ -59,7 +59,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-fit px-4">
+    <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[9998] w-full max-w-fit px-4">
       <nav
         className={`
           flex items-center gap-2 p-2 rounded-full
