@@ -12,13 +12,34 @@ export default function ProjectsSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showUI, setShowUI] = useState(false);
   const [targetIndex, setTargetIndex] = useState<number | null>(null);
-  
   const [isAutoPlay, setIsAutoPlay] = useState(false);
+
+  // YENİ 1: Sahne ekranda mı değil mi takip eden state
+  const [isInView, setIsInView] = useState(true);
+
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // OPTİMİZE EDİLMİŞ VERİ İŞLEYİCİ
-  // Artık saniyede 60 kere değil, sadece değişim olduğunda çalışır.
+  // YENİ 2: Intersection Observer (Görünürlük İzleyicisi)
+  // Bu kod, kullanıcı bu bölümden çıktığı anı yakalar.
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Bölüm ekrandaysa (veya %10'u görünüyorsa) true, tamamen çıktıysa false
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.1 } 
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) observer.disconnect();
+    };
+  }, []);
+
   const handleScrollData = useCallback((data: { index: number, showUI: boolean }) => {
     setActiveIndex(data.index);
     setShowUI(data.showUI);
@@ -27,14 +48,12 @@ export default function ProjectsSection() {
   const handleNavigate = useCallback((index: number) => {
     if (index >= 0 && index < projectsData.length) {
       setTargetIndex(index);
-      // Kullanıcı müdahale edince autoplay'i durdurmak daha iyi bir UX olabilir
-      // setIsAutoPlay(false); 
     }
   }, []);
 
-  // Auto Play
+  // Auto Play (Sadece görünürken çalışsın diye isInView eklendi)
   useEffect(() => {
-    if (isAutoPlay) {
+    if (isAutoPlay && isInView) {
       autoPlayRef.current = setInterval(() => {
         setTargetIndex((prevTarget) => {
           const currentBase = prevTarget !== null ? prevTarget : activeIndex;
@@ -45,15 +64,13 @@ export default function ProjectsSection() {
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
     }
     return () => { if (autoPlayRef.current) clearInterval(autoPlayRef.current); };
-  }, [isAutoPlay, activeIndex]);
+  }, [isAutoPlay, activeIndex, isInView]);
 
   return (
     <div ref={containerRef} className="w-full h-screen bg-[#030303] relative overflow-hidden font-sans">
       
-      {/* Arayüz */}
       <ProjectList activeIndex={activeIndex} showUI={showUI} />
 
-      {/* Navigasyon Barı */}
       <ProjectProgress 
         data={projectsData} 
         activeIndex={activeIndex} 
@@ -62,17 +79,18 @@ export default function ProjectsSection() {
         onToggleAutoPlay={() => setIsAutoPlay(!isAutoPlay)}
       />
 
-      {/* 3D Sahne */}
+      {/* YENİ 3: frameloop Ayarı 
+          isInView false ise (ekranda değilse) "never" moduna geçer ve 
+          3D çizimi tamamen durdurur. Bu sayede Contact sayfasında kasmayı önler.
+      */}
       <Canvas
+        frameloop={isInView ? "always" : "never"}
         shadows={false}
-        dpr={[1, 1.5]} // Performans için pixel ratio sınırlandı
+        dpr={[1, 1.5]}
         camera={{ position: [0, 0, 28], fov: 35 }}
         gl={{ antialias: true, powerPreference: "high-performance" }}
         className="absolute top-0 left-0 z-0"
-        // style={{ pointerEvents: 'none' }} // BUNU YAPMA! ScrollControls bozulur.
       >
-        {/* DAMPING AYARI: 0.2'den 0.1'e düşürdük. 
-            Daha düşük değer = Daha az sürtünme = Daha hızlı ve akıcı scroll */}
         <ScrollControls pages={projectsData.length} damping={0.1}>
           
           <ScrollManager 
