@@ -6,11 +6,9 @@ import * as THREE from 'three';
 import { Macbook } from '@/components/canvas/Macbook'; 
 import { projectsData } from '@/data/portfolio-data';
 
-// --- OPTİMİZE EDİLMİŞ SCROLL HANDLER ---
+// --- SCROLL HANDLER (Aynı) ---
 export const ScrollHandler = ({ onScrollChange }: { onScrollChange: (data: { index: number, showUI: boolean }) => void }) => {
   const scroll = useScroll();
-  
-  // Önceki değerleri hafızada tutuyoruz
   const lastIndex = useRef(-1);
   const lastShowUI = useRef(false);
 
@@ -18,11 +16,8 @@ export const ScrollHandler = ({ onScrollChange }: { onScrollChange: (data: { ind
     const rOffset = scroll.offset;
     const rawIndex = Math.floor(rOffset * projectsData.length);
     const index = Math.max(0, Math.min(rawIndex, projectsData.length - 1));
-    
-    // UI Görünürlük mantığı: %3'ten fazla kaydırıldıysa göster
     const showUI = rOffset > 0.03;
 
-    // SADECE DEĞİŞİKLİK VARSA GÜNCELLE (Performansın sırrı burası)
     if (lastIndex.current !== index || lastShowUI.current !== showUI) {
       lastIndex.current = index;
       lastShowUI.current = showUI;
@@ -32,31 +27,37 @@ export const ScrollHandler = ({ onScrollChange }: { onScrollChange: (data: { ind
   return null;
 };
 
+// --- ANIMATED MACBOOK (SENİN HASSAS AYARLARIN) ---
 const AnimatedMacbook = () => {
   const scroll = useScroll();
   const ref = useRef<THREE.Group>(null);
-  const { width } = useThree((state) => state.viewport);
-  const isMobile = width < 8;
+  const { width, height } = useThree((state) => state.viewport);
+  
+  // Mobil algılama
+  const isMobile = width < 15 || width < height;
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useFrame((state, delta) => {
     if (!ref.current) return;
-    
-    // Smoothness (Akıcılık) ayarı
     const dt = Math.min(delta, 0.1); 
     const rOffset = scroll.offset;
-
     const rawIndex = Math.floor(rOffset * projectsData.length);
     const index = Math.max(0, Math.min(rawIndex, projectsData.length - 1));
     if (index !== currentIndex) setCurrentIndex(index);
 
-    const targetX = isMobile ? 0 : -width / 4;
-    const targetY = isMobile ? 0.5 : -1.5;
+    // ==========================================
+    // SENİN AYARLADIĞIN DEĞERLER (KORUNDU)
+    // ==========================================
+    const mobileX = 0; 
+    const mobileY = 0.5; // Model 1.0'dan 0.5'e indi
+    // ==========================================
+
+    const targetX = isMobile ? mobileX : -width / 4;
+    const targetY = isMobile ? mobileY : -2.5;
     
-    // Bilgisayarın sola kayma eşiği (Daha erken kayması için 0.02 yaptık)
-    const moveX = isMobile ? 0 : (rOffset > 0.02 ? targetX : 0);
+    const moveX = isMobile ? targetX : (rOffset > 0.02 ? targetX : 0);
     
-    // Damp faktörünü 3'ten 4'e çıkardık (Biraz daha hızlı tepki)
     ref.current.position.x = THREE.MathUtils.damp(ref.current.position.x, moveX, 4, dt);
     ref.current.position.y = THREE.MathUtils.damp(ref.current.position.y, targetY, 4, dt);
     
@@ -70,7 +71,8 @@ const AnimatedMacbook = () => {
   return (
     <group ref={ref} position={[0, -1.5, 0]} rotation={[0.2, 0.5, 0]}>
         <Macbook 
-            scale={0.3} 
+            // SENİN AYARLADIĞIN SCALE (KORUNDU)
+            scale={isMobile ? 0.19 : 0.3} 
             screenTexture={currentProject?.media} 
             mediaType={currentProject?.type} 
         />
@@ -78,14 +80,34 @@ const AnimatedMacbook = () => {
   );
 };
 
+// --- SAHNE İÇERİĞİ VE IŞIKLAR ---
 export const MacbookSceneContent = ({ setScrollData }: { setScrollData: (data: { index: number, showUI: boolean }) => void }) => {
+  // Işıkların da mobil olup olmadığını bilmesi için buraya da useThree ekledik
+  const { width, height } = useThree((state) => state.viewport);
+  const isMobile = width < 15 || width < height;
+
   return (
     <>
       <ScrollHandler onScrollChange={setScrollData} />
       
-      <ambientLight intensity={0.5} />
-      <SpotLight position={[10, 10, 10]} angle={0.5} penumbra={1} intensity={200} color="#ffffff" />
-      <SpotLight position={[-10, 5, 10]} angle={0.5} penumbra={1} intensity={100} color="#8b5cf6" />
+      {/* Ortam ışığı: Model küçük olduğu için biraz parlaklık iyidir */}
+      <ambientLight intensity={isMobile ? 0.8 : 0.5} />
+      
+      
+    
+
+      {/* SPOT IŞIK 2 (Mor Dolgu):
+         Model aşağı indiği için bunu da Y=2'ye indirdik.
+         Modeli sol taraftan hafifçe aydınlatacak.
+      */}
+      <SpotLight 
+        position={isMobile ? [-4, 8, 5] : [-10, 5, 10]} 
+        angle={isMobile ? 0.6 : 0.5} 
+        penumbra={1} 
+        intensity={isMobile ? 200 : 100} 
+        color="#8b5cf6" 
+      />
+
       <Environment preset="city" />
       
       <Suspense fallback={null}>

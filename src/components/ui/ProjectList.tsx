@@ -4,20 +4,19 @@ import { projectsData } from '@/data/portfolio-data';
 
 interface ProjectListProps {
   activeIndex: number;
-  showUI: boolean; // YENİ: UI görünsün mü kontrolü
+  showUI: boolean;
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({ activeIndex, showUI }) => {
   return (
-    // pointer-events-none: Scroll'un arkaya geçmesini sağlar
-    <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-50 flex flex-col justify-between p-8 md:p-20">
+    <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-40 flex flex-col justify-between p-6 md:p-20 pt-24 md:pt-20">
       
-      {/* Başlık - showUI true ise görünür */}
+      {/* Başlık */}
       <div 
         className="w-full transition-all duration-1000" 
         style={{ opacity: showUI ? 1 : 0, transform: showUI ? 'translateY(0)' : 'translateY(-20px)' }}
       >
-        <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tighter drop-shadow-lg">
+        <h1 className="text-3xl md:text-6xl font-bold text-white tracking-tighter drop-shadow-2xl">
             Seçilmiş <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
                 Projeler
@@ -26,19 +25,24 @@ const ProjectList: React.FC<ProjectListProps> = ({ activeIndex, showUI }) => {
       </div>
 
       {/* Liste */}
-      <div className="flex flex-col w-full md:w-1/2 ml-auto pb-20 relative h-[400px]">
+      <div className="flex flex-col w-full md:w-1/2 ml-auto pb-24 relative h-[350px] md:h-[400px]">
         {projectsData.map((project, index) => {
-          // Hem aktif index hem de showUI true olmalı
           const isActive = activeIndex === index && showUI;
 
           return (
             <div 
               key={index}
-              className="absolute top-0 left-0 w-full flex flex-col gap-4 transition-all duration-700 ease-out"
+              // DEĞİŞİKLİK 1: Arka plana soldan sağa silinen siyah bir gradyan ekledik (from-black/80).
+              // p-6 ve rounded ekleyerek bu gölgeyi yumuşattık.
+              className={`
+                absolute top-0 left-0 w-full flex flex-col gap-3 md:gap-4 
+                transition-all duration-700 ease-out
+                p-6 -ml-6 rounded-3xl
+                ${isActive ? 'bg-gradient-to-r from-black/80 via-black/40 to-transparent backdrop-blur-[2px]' : ''}
+              `}
               style={{
                 opacity: isActive ? 1 : 0,
                 transform: `translateY(${isActive ? 0 : 50}px) scale(${isActive ? 1 : 0.95})`,
-                // ÖNEMLİ: Genel kapsayıcı 'none', böylece scroll çalışır.
                 pointerEvents: 'none', 
               }}
             >
@@ -49,23 +53,24 @@ const ProjectList: React.FC<ProjectListProps> = ({ activeIndex, showUI }) => {
                     style={{ backgroundColor: project.color, transform: isActive ? 'scaleX(1)' : 'scaleX(0)' }} 
                   />
                 </div>
-                <span className="font-mono text-sm text-white/50">0{index + 1}</span>
+                <span className="font-mono text-sm text-white/80 font-bold shadow-black drop-shadow-md">0{index + 1}</span>
               </div>
               
-              <h2 className="text-4xl md:text-5xl font-bold text-white drop-shadow-md">
+              {/* DEĞİŞİKLİK 2: Başlığa çok güçlü bir drop-shadow ekledik */}
+              <h2 className="text-3xl md:text-5xl font-bold text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">
                 {project.title}
               </h2>
               
-              <div className="backdrop-blur-sm bg-black/20 p-4 rounded-xl border border-white/10 max-w-md">
-                <p className="text-lg leading-relaxed text-gray-300">
+              {/* DEĞİŞİKLİK 3: Açıklama kutusunun arka planını biraz daha koyulaştırdık (bg-black/60) */}
+              <div className="backdrop-blur-md bg-black/60 p-4 rounded-xl border border-white/10 max-w-md shadow-2xl">
+                <p className="text-sm md:text-lg leading-relaxed text-gray-100 font-medium">
                     {project.description}
                 </p>
               </div>
 
               <div className="flex gap-2 flex-wrap">
                 {project.tech.map((tech, i) => (
-                  // Sadece butonlar tıklanabilir olsun (pointer-events-auto)
-                  <span key={i} className="pointer-events-auto px-3 py-1 rounded-full text-sm font-medium bg-white/10 border border-white/10 text-white/80 hover:bg-white/20 transition-colors">
+                  <span key={i} className="pointer-events-auto px-2 py-1 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium bg-black/50 border border-white/20 text-white hover:bg-white/20 transition-colors shadow-lg">
                     {tech}
                   </span>
                 ))}

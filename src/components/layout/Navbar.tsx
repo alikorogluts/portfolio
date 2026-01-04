@@ -15,42 +15,33 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    // 1. Intersection Observer Ayarları
+    // YENİ MANTIK: Ekranın Ortası Yöntemi
     const options = {
-      root: null, // Viewport'u baz al
-      rootMargin: '0px',
-      // KRİTİK AYAR: Bölümün %60'ı görünmeden aktif yapma.
-      // Bu, Scroll Snap yapılarında en kararlı yöntemdir.
-      threshold: 0.6 
+      root: null,
+      // rootMargin: Ekranın üstünden %45 ve altından %45 kırp.
+      // Geriye ortada %10'luk ince bir şerit kalır.
+      // Hangi bölüm bu şeride girerse o aktiftir.
+      rootMargin: '-45% 0px -45% 0px', 
+      threshold: 0 // Çizgiye değer değmez tetikle
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          // Ekrana giren bölümün ID'sini al (örn: 'about')
           const visibleId = entry.target.id;
-          
-          // ID'yi NavItem ismine eşle
-          // href: '#about' -> activeTab: 'About'
           const activeItem = navItems.find(item => item.href === `#${visibleId}`);
           
           if (activeItem) {
             setActiveTab(activeItem.name);
           }
 
-          // Navbar arka plan koyuluğunu ayarla (Hero dışındaysa koyulaştır)
-          if (visibleId === 'hero') {
-             setIsScrolled(false);
-          } else {
-             setIsScrolled(true);
-          }
+          // Navbar arkaplan kontrolü
+          setIsScrolled(visibleId !== 'hero');
         }
       });
     }, options);
 
-    // 2. Tüm bölümleri izlemeye başla
     navItems.forEach((item) => {
-      // href='#hero' olduğu için başındaki '#' işaretini kaldırıp ID olarak arıyoruz
       const element = document.getElementById(item.href.substring(1));
       if (element) observer.observe(element);
     });
@@ -68,7 +59,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-fit px-4">
+    <header className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-fit px-4">
       <nav
         className={`
           flex items-center gap-2 p-2 rounded-full
@@ -89,7 +80,6 @@ export default function Navbar() {
               ${activeTab === item.name ? 'text-white' : 'text-white/50 hover:text-white/90'}
             `}
           >
-            {/* ARKADAKİ HAREKETLİ IŞIK (PILL) */}
             {activeTab === item.name && (
               <motion.div
                 layoutId="active-pill"
@@ -100,7 +90,6 @@ export default function Navbar() {
             
             {item.name}
             
-            {/* ALTTAKİ PARLAMA ÇİZGİSİ */}
             {activeTab === item.name && (
                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-[2px] bg-gradient-to-r from-transparent via-purple-500 to-transparent blur-[1px]" />
             )}
