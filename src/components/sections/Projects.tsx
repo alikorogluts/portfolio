@@ -1,14 +1,21 @@
 'use client';
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import  { useState, useRef, useEffect, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ScrollControls } from '@react-three/drei';
 import ProjectList from '@/components/ui/ProjectList';
 import { MacbookSceneContent } from '@/components/canvas/MacbookScene';
-import { projectsData } from '@/data/portfolio-data';
 import ProjectProgress from '@/components/ui/ProjectProgress';
 import { ScrollManager } from '@/components/canvas/ScrollManager'; 
 
-export default function ProjectsSection() {
+import { Project } from '@prisma/client';
+
+interface ProjectsSectionProps {
+  projectsData: Project[];
+  introMedia?: string; 
+  introType?: string;
+}
+
+export default function ProjectsSection({ projectsData,introMedia,introType }: ProjectsSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showUI, setShowUI] = useState(false);
   const [targetIndex, setTargetIndex] = useState<number | null>(null);
@@ -69,7 +76,7 @@ export default function ProjectsSection() {
   return (
     <div ref={containerRef} className="w-full h-screen bg-[#030303] relative overflow-hidden font-sans">
       
-      <ProjectList activeIndex={activeIndex} showUI={showUI} />
+      <ProjectList projectsData={projectsData} activeIndex={activeIndex} showUI={showUI} />
 
       <ProjectProgress 
         data={projectsData} 
@@ -99,7 +106,7 @@ export default function ProjectsSection() {
              onScrollComplete={() => setTargetIndex(null)} 
           />
 
-          <MacbookSceneContent setScrollData={handleScrollData} />
+          <MacbookSceneContent projects={projectsData} setScrollData={handleScrollData} introMedia={introMedia} introType={introType} />
           
         </ScrollControls>
       </Canvas>

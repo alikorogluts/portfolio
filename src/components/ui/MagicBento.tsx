@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
-import { bentoData } from '@/data/portfolio-data'; // Veriyi buradan çekiyoruz
+import { bentoData } from '@prisma/client'; 
 
 // --- TİPLER ---
 export interface BentoProps {
@@ -16,6 +16,8 @@ export interface BentoProps {
   glowColor?: string;
   clickEffect?: boolean;
   enableMagnetism?: boolean;
+  bentoData: bentoData[];
+  
 }
 
 const DEFAULT_PARTICLE_COUNT = 12;
@@ -205,7 +207,7 @@ const GlobalSpotlight: React.FC<{ gridRef: React.RefObject<HTMLDivElement | null
 };
 
 // --- ANA BİLEŞEN ---
-const MagicBento: React.FC<BentoProps> = ({ textAutoHide = true, enableStars = true, enableSpotlight = true, enableBorderGlow = true, disableAnimations = false, spotlightRadius = DEFAULT_SPOTLIGHT_RADIUS, particleCount = DEFAULT_PARTICLE_COUNT, enableTilt = false, glowColor = DEFAULT_GLOW_COLOR, clickEffect = true, enableMagnetism = true }) => {
+const MagicBento: React.FC<BentoProps> = ({ textAutoHide = true, enableStars = true, enableSpotlight = true, enableBorderGlow = true, disableAnimations = false, spotlightRadius = DEFAULT_SPOTLIGHT_RADIUS, particleCount = DEFAULT_PARTICLE_COUNT, enableTilt = false, glowColor = DEFAULT_GLOW_COLOR, clickEffect = true, enableMagnetism = true ,bentoData}) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
 

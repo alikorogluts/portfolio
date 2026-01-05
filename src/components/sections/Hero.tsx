@@ -4,7 +4,14 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import TextType from '@/components/ui/TextType';
 import Prism from '@/components/canvas/Prism';
-export default function Hero() {
+
+interface HeroProps {
+  heroTextWriter: string[];
+  heroTitle?:string;
+  heroSubtitle?:string;
+}
+
+export default function Hero({heroSubtitle,heroTextWriter,heroTitle}: HeroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -53,7 +60,7 @@ export default function Hero() {
 
           
           <TextType className='hero-reveal text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight'
-            text={["Merhaba, Ben Ali Köroğlu",""]}
+            text={heroTextWriter? heroTextWriter : ["Merhaba, Ben Ali Köroğlu"]}
             typingSpeed={75}
             pauseDuration={1500}
             showCursor={true}
@@ -61,11 +68,11 @@ export default function Hero() {
           />
 
           <p className="hero-reveal text-lg md:text-xl text-gray-300">
-            .NET ve Next.js ile modern web çözümleri geliştiriyorum.
+            {heroTitle ? heroTitle: ".NET ve Next.js ile modern web çözümleri geliştiriyorum."}
           </p>
 
           <p className="hero-reveal text-lg md:text-xl text-gray-400 mb-10">
-            Deneyimlerimi ve projelerimi burada paylaşıyorum.
+            {heroSubtitle ? heroSubtitle : "Deneyimlerimi ve projelerimi burada paylaşıyorum."}
           </p>
 
         </div>

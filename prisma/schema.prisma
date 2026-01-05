@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Proje Modeli
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  tech        String[] // Dizi olarak teknolojiler (React, .NET vb)
+  media       String   // Resim veya Video URL'i
+  type        String   // "video" veya "image"
+  color       String?  // Arkaplan rengi
+  createdAt   DateTime @default(now())
+}
+
+model BentoData{
+  id          String   @id @default(uuid())
+  title       String 
+  color       String
+  description String
+  label       String
+  createdAt   DateTime @default(now())
+}
+
+model SiteSettings {
+  id              String   @id @default(uuid())
+  
+  // 3D Sahne Açılış Medyası (Macbook Ekranı)
+  introMedia      String   // Macbook açılış görseli/videosu
+  introType       String   // "image" veya "video"
+
+  // Hero Bölümü (Giriş Yazıları)
+  heroTextWriter    String
+  heroTitle       String   
+  heroSubtitle    String   
+  
+  // İletişim Linkleri
+  contactLinkedIn String
+  contactGithub   String
+  contactEmail    String   
+  
+
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+}
+
+
+model ContactMessage{
+  id      String  @id @default(uuid())
+  name    String 
+  email   String
+  subject String
+  message String
+  createdAt DateTime @default(now())
+}

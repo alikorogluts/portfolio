@@ -1,8 +1,11 @@
 'use client';
 import MagicBento from '@/components/ui/MagicBento';
-import React from 'react';
+import { bentoData } from '@prisma/client';
 
-const About = () => {
+interface AboutProps {
+  bentoData: bentoData[];
+}
+const About = ({bentoData}:AboutProps) => {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-purple-500/30 overflow-x-hidden flex flex-col justify-center py-10">
       
@@ -28,6 +31,7 @@ const About = () => {
             spotlightRadius={800} 
             particleCount={20} 
             glowColor="132, 0, 255"
+            bentoData={bentoData}
           />
         </div>
       </section>

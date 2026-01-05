@@ -1,13 +1,14 @@
 'use client';
 import React from 'react';
-import { projectsData } from '@/data/portfolio-data';
+import { Project } from '@prisma/client';
 
 interface ProjectListProps {
   activeIndex: number;
   showUI: boolean;
-}
+  projectsData: Project[]; // İsmi burada projectsData yaptık
+} 
 
-const ProjectList: React.FC<ProjectListProps> = ({ activeIndex, showUI }) => {
+const ProjectList: React.FC<ProjectListProps> = ({ activeIndex, showUI, projectsData }) => {
   return (
     <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-40 flex flex-col justify-between p-6 md:p-20 pt-24 md:pt-20">
       
@@ -31,9 +32,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ activeIndex, showUI }) => {
 
           return (
             <div 
-              key={index}
-              // DEĞİŞİKLİK 1: Arka plana soldan sağa silinen siyah bir gradyan ekledik (from-black/80).
-              // p-6 ve rounded ekleyerek bu gölgeyi yumuşattık.
+              key={project.id || index} // Varsa ID kullanmak daha sağlıklıdır
               className={`
                 absolute top-0 left-0 w-full flex flex-col gap-3 md:gap-4 
                 transition-all duration-700 ease-out
@@ -50,18 +49,17 @@ const ProjectList: React.FC<ProjectListProps> = ({ activeIndex, showUI }) => {
                 <div className="w-12 h-1 bg-white/20 rounded-full overflow-hidden">
                   <div 
                     className="h-full transition-all duration-500 origin-left" 
-                    style={{ backgroundColor: project.color, transform: isActive ? 'scaleX(1)' : 'scaleX(0)' }} 
+                    // Renk null gelirse varsayılan beyaz olsun
+                    style={{ backgroundColor: project.color || '#ffffff', transform: isActive ? 'scaleX(1)' : 'scaleX(0)' }} 
                   />
                 </div>
                 <span className="font-mono text-sm text-white/80 font-bold shadow-black drop-shadow-md">0{index + 1}</span>
               </div>
               
-              {/* DEĞİŞİKLİK 2: Başlığa çok güçlü bir drop-shadow ekledik */}
               <h2 className="text-3xl md:text-5xl font-bold text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">
                 {project.title}
               </h2>
               
-              {/* DEĞİŞİKLİK 3: Açıklama kutusunun arka planını biraz daha koyulaştırdık (bg-black/60) */}
               <div className="backdrop-blur-md bg-black/60 p-4 rounded-xl border border-white/10 max-w-md shadow-2xl">
                 <p className="text-sm md:text-lg leading-relaxed text-gray-100 font-medium">
                     {project.description}
