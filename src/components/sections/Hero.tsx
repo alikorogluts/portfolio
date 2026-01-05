@@ -36,7 +36,7 @@ export default function Hero({heroSubtitle,heroTextWriter,heroTitle}: HeroProps)
       <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black z-0" />
 
       <div className="absolute inset-0 z-10 pointer-events-none opacity-70">
-       {/*<Prism
+       {<Prism
           animationType="rotate"
           timeScale={0.4}
           height={3.5}
@@ -46,8 +46,9 @@ export default function Hero({heroSubtitle,heroTextWriter,heroTitle}: HeroProps)
           colorFrequency={1}
           noise={0.4}
           glow={1}
-        />*/} 
+        />} 
       </div>
+      
 
       <div className="absolute inset-0 bg-black/40 z-20" />
 
