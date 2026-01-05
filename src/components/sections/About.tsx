@@ -1,9 +1,9 @@
 'use client';
 import MagicBento from '@/components/ui/MagicBento';
-import { bentoData } from '@prisma/client';
+import { BentoData } from '@prisma/client';
 
 interface AboutProps {
-  bentoData: bentoData[];
+  bentoData: BentoData[];
 }
 const About = ({bentoData}:AboutProps) => {
   return (
