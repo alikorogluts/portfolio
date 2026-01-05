@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
-import { bentoData } from '@prisma/client'; 
+import { BentoData } from '@prisma/client'; 
 
 // --- TİPLER ---
 export interface BentoProps {
@@ -16,7 +16,7 @@ export interface BentoProps {
   glowColor?: string;
   clickEffect?: boolean;
   enableMagnetism?: boolean;
-  bentoData: bentoData[];
+  bentoData: BentoData[];
   
 }
 
